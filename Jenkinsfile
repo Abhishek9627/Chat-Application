@@ -4,34 +4,36 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Abhishek9627/Chat-Application.git', credentialsId: 'github-token'
+                git branch: 'main', 
+                    url: 'https://github.com/Abhishek9627/Chat-Application.git', 
+                    credentialsId: 'github-token'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh '''
+                sh """
                 cd backend
                 npm install
 
                 cd ../frontend
                 npm install
                 npm run build
-                '''
+                """
             }
         }
 
         stage('Deploy') {
             steps {
-                sh '''
+                sh """
                 pm2 stop all || true
 
                 cd backend
-                pm2 start index.js --name backend
+                pm2 start index.js --name backend || true
 
                 cd ../frontend
-                serve -s build -l 3000 || true
-                '''
+                npx serve -s build -l 3000 --no-clipboard || true
+                """
             }
         }
     }
