@@ -2,39 +2,30 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', 
-                    url: 'https://github.com/Abhishek9627/Chat-Application.git', 
+                git branch: 'main',
+                    url: 'https://github.com/Abhishek9627/Chat-Application.git',
                     credentialsId: 'github-token'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build & Deploy with Docker Compose') {
             steps {
                 sh """
-                cd backend
-                npm install
+                echo "Stopping existing containers..."
+                docker compose down || true
 
-                cd ../frontend
-                npm install
-                npm run build
+                echo "Building and starting new containers..."
+                docker compose up -d --build
                 """
             }
         }
+    }
 
-        stage('Deploy') {
-            steps {
-                sh """
-                pm2 stop all || true
-
-                cd backend
-                pm2 start index.js --name backend || true
-
-                cd ../frontend
-                npx serve -s build -l 3000 --no-clipboard || true
-                """
-            }
+    post {
+        always {
+            echo "Deployment Completed Successfully!"
         }
     }
 }
