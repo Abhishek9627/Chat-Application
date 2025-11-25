@@ -14,10 +14,10 @@ pipeline {
             steps {
                 sh """
                 echo "Stopping existing containers..."
-                docker compose down || true
+                docker-compose down || true
 
                 echo "Building and starting new containers..."
-                docker compose up -d --build
+                docker-compose up -d --build
                 """
             }
         }
