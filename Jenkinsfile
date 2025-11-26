@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
@@ -19,11 +20,11 @@ pipeline {
                 sh """
                 echo "Installing Backend Dependencies..."
                 cd backend
-                npm install || true
+                npm install
 
                 echo "Installing Frontend Dependencies..."
                 cd ../frontend
-                npm install || true
+                npm install
                 """
             }
         }
@@ -31,9 +32,9 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 sh """
-                echo "Building Frontend React App..."
+                echo "Building Frontend..."
                 cd frontend
-                npm run build || true
+                npm run build
                 """
             }
         }
@@ -57,5 +58,3 @@ pipeline {
         }
     }
 }
-
-
