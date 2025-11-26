@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_COMPOSE = "docker-compose"
+        DOCKER_COMPOSE = "/usr/local/bin/docker-compose"
     }
 
     stages {
@@ -15,15 +15,21 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Backend Dependencies') {
             steps {
                 sh """
                 echo "Installing Backend Dependencies..."
                 cd backend
                 npm install
+                """
+            }
+        }
 
+        stage('Install Frontend Dependencies') {
+            steps {
+                sh """
                 echo "Installing Frontend Dependencies..."
-                cd ../frontend
+                cd frontend
                 npm install
                 """
             }
@@ -32,7 +38,7 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 sh """
-                echo "Building Frontend..."
+                echo "Building React App..."
                 cd frontend
                 npm run build
                 """
@@ -42,10 +48,10 @@ pipeline {
         stage('Docker Compose Build & Deploy') {
             steps {
                 sh """
-                echo "Stopping existing containers..."
+                echo "Stopping Old Containers..."
                 ${DOCKER_COMPOSE} down || true
 
-                echo "Building & starting new containers..."
+                echo "Building & Starting New Containers..."
                 ${DOCKER_COMPOSE} up -d --build
                 """
             }
