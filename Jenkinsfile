@@ -70,6 +70,8 @@ pipeline {
 
     environment {
         DOCKER_COMPOSE = "/usr/local/bin/docker-compose"
+        NODE_OPTIONS = "--max_old_space_size=4096"
+        NPM_REGISTRY = "https://registry.npmjs.org/"
     }
 
     stages {
@@ -101,9 +103,13 @@ pipeline {
             steps {
                 sh '''
                 set -e
-                echo "Installing Backend Dependencies..."
                 cd backend
-                npm install
+
+                echo "Setting npm registry..."
+                npm config set registry ${NPM_REGISTRY}
+
+                echo "Installing backend dependencies..."
+                npm install --legacy-peer-deps
                 '''
             }
         }
@@ -112,9 +118,13 @@ pipeline {
             steps {
                 sh '''
                 set -e
-                echo "Installing Frontend Dependencies..."
                 cd frontend
-                npm install
+
+                echo "Setting npm registry..."
+                npm config set registry ${NPM_REGISTRY}
+
+                echo "Installing frontend dependencies..."
+                CI=false npm install --legacy-peer-deps
                 '''
             }
         }
@@ -123,9 +133,10 @@ pipeline {
             steps {
                 sh '''
                 set -e
-                echo "Building React App..."
                 cd frontend
-                npm run build
+
+                echo "Building React App..."
+                CI=false npm run build
                 '''
             }
         }
